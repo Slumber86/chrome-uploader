@@ -27,11 +27,32 @@ var config = require('./lib/config');
 window.DEBUG = config.DEBUG;
 // Important: need to require App after setting `window.DEBUG` to enable logging
 var Root = require('./lib/redux/containers/Root');
+var os = require('os');
 
-chrome.runtime.getPlatformInfo(function (platformInfo) {
+var hostMap = {
+  'darwin': 'mac',
+  'win32' : 'win',
+  'linux': 'linux',
+};
+
+var archMap = {
+  'arm': 'arm',
+  'arm64': 'arm',
+  'x86': 'x86-32',
+  'x32': 'x86-32', // ??
+  'x64': 'x86-64',
+};
+
+var platformInfo = {
+  os: hostMap[os.platform()],
+  arch: archMap[os.arch()],
+  nacl_arch: archMap[os.arch()],
+};
+
+//chrome.runtime.getPlatformInfo(function (platformInfo) {
   if (!_.isEmpty(platformInfo.os)) {
     ReactDOM.render(
       React.createElement(Root, {os: platformInfo.os}), document.getElementById('app')
     );
   }
-});
+//});

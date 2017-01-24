@@ -9,7 +9,8 @@ var definePlugin = new webpack.DefinePlugin({
   __DEBUG__: JSON.stringify(JSON.parse(process.env.DEBUG_ERROR || 'false')),
   __REDUX_LOG__: JSON.stringify(JSON.parse(process.env.REDUX_LOG || 'false')),
   __REDUX_DEV_UI__: JSON.stringify(JSON.parse(process.env.REDUX_DEV_UI || 'false')),
-  __TEST__: false
+  __TEST__: false,
+  'global.GENTLY': false, // https://github.com/visionmedia/superagent/wiki/SuperAgent-for-Webpack for platform-client
 });
 
 if (process.env.DEBUG_ERROR === 'true') {
@@ -35,12 +36,12 @@ var config = {
   devtool: '#cheap-module-source-map',
   devServer: {
     outputPath: path.join(__dirname, '/build'),
-    publicPath: '/build/'
+    publicPath: './build/'
   },
   output: {
     path: path.join(__dirname, '/build'),
     filename: 'bundle.js',
-    publicPath: '/build/',
+    publicPath: './build/',
   },
   module: {
     loaders: [
@@ -48,7 +49,8 @@ var config = {
       { test: /\.jsx$/, exclude: /(node_modules)/, loaders: ['react-hot', 'babel-loader'] },
       { test: /\.module\.less$/, loader: 'style?sourceMap!css-loader?modules&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]!less?sourceMap' },
       { test: /^((?!module).)*\.less$/, loader: 'style!css!less' },
-      { test: /\.json$/, loader: 'json' }
+      { test: /\.json$/, loader: 'json' },
+      { test: /\.(png|jpg|woff)$/, loader: 'file-loader' }
     ]
   },
   plugins: [
@@ -58,8 +60,9 @@ var config = {
   // to fix the 'broken by design' issue with npm link-ing modules
   resolve: { fallback: path.join(__dirname, 'node_modules') },
   resolveLoader: { fallback: path.join(__dirname, 'node_modules') },
+  target: 'electron',
   node: {
-    fs: 'empty'
+    __dirname: true, // https://github.com/visionmedia/superagent/wiki/SuperAgent-for-Webpack for platform-client
   }
 };
 
